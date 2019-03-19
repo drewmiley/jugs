@@ -1,9 +1,21 @@
+const euclid = (a, b) => {
+    console.log(a);
+    console.log(b);
+    return [1, 1];
+}
+
 const hcf = (a, b) => {
+    const euclidMultipliers = euclid(a, b);
+    const hcf = euclidMultipliers[0] * a + euclidMultipliers[1] * b;
+    console.log(hcf);
     return 1;
 }
 
 const solveJugs = (jug1, jug2, fill) => {
-    output.innerHTML = "Jugs";
+    const euclidMultipliers = euclid(jug1, jug2);
+    const jug1Multiplier = fill * euclidMultipliers[0];
+    const jug2Multiplier = fill * euclidMultipliers[1];
+    output.innerHTML = `${ fill } = ${ jug1Multiplier } * ${ jug1 } + ${ jug2Multiplier } * ${ jug2 }`;
 }
 
 (function () {
