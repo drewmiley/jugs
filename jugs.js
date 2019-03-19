@@ -30,28 +30,62 @@ const hcf = (a, b) => {
     return euclidMultipliers[0] * a + euclidMultipliers[1] * b;
 }
 
-const solveJugs = (jug1, jug2, fill) => {
+const solveJugsByEuclid = (jug1, jug2, fill) => {
     const euclidMultipliers = euclid(jug1, jug2);
     const jug1Multiplier = fill * euclidMultipliers[0];
     const jug2Multiplier = fill * euclidMultipliers[1];
     output.innerHTML = `${ fill } = ${ jug1Multiplier } * ${ jug1 } + ${ jug2Multiplier } * ${ jug2 }`;
 }
 
-(function () {
-    document.getElementById("solve").onclick = () => {
-        const output = document.getElementById("output");
-        output.innerHTML = "";
-        const jug1 = parseInt(document.getElementById("jug1").value, 10);
-        const jug2 = parseInt(document.getElementById("jug2").value, 10);
-        const fill = parseInt(document.getElementById("fill").value, 10);
-        if (isNaN(jug1 + jug2 + fill)) {
-            output.innerHTML = "Invalid Input";
-        } else if (jug1 <= 0 || jug2 <= 0 || fill <= 0) {
-            output.innerHTML = "Inputs should be greater than 0";
-        } else if (hcf(jug1, jug2) > 1) {
-            output.innerHTML = "Jug levels should be coprime";
+const solveJugsByFermat = (jug1, jug2, fill) => {
+    const a = Math.min(jug1, jug2);
+    const m = Math.max(jug1, jug2);
+    const totientM = [...Array(m).keys()]
+        .filter(d => d)
+        .filter(d => hcf(d, m) === 1)
+        .length;
+    let inverse = 1;
+    for (let i = 1; i <= totientM - 1; i++) {
+        inverse = (inverse * a) % m;
+    }
+    let jug1Multiplier;
+    let jug2Multiplier;
+    if (jug1 >= jug2) {
+        jug2Multiplier = fill * inverse;
+        jug1Multiplier = fill * (1 - inverse * jug2) / m;
+    } else {
+        jug1Multiplier = fill * inverse;
+        jug2Multiplier = fill * (1 - inverse * jug1) / m;
+    }
+    output.innerHTML = `${ fill } = ${ jug1Multiplier } * ${ jug1 } + ${ jug2Multiplier } * ${ jug2 }`;
+}
+
+const solve = (euclid = true) => {
+    const output = document.getElementById("output");
+    output.innerHTML = "";
+    const jug1 = parseInt(document.getElementById("jug1").value, 10);
+    const jug2 = parseInt(document.getElementById("jug2").value, 10);
+    const fill = parseInt(document.getElementById("fill").value, 10);
+    if (isNaN(jug1 + jug2 + fill)) {
+        output.innerHTML = "Invalid Input";
+    } else if (jug1 <= 0 || jug2 <= 0 || fill <= 0) {
+        output.innerHTML = "Inputs should be greater than 0";
+    } else if (hcf(jug1, jug2) > 1) {
+        output.innerHTML = "Jug levels should be coprime";
+    } else {
+        if (euclid) {
+            solveJugsByEuclid(jug1, jug2, fill);
         } else {
-            solveJugs(jug1, jug2, fill);
+            solveJugsByFermat(jug1, jug2, fill);
         }
+    }
+}
+
+(function () {
+    document.getElementById("solveByEuclid").onclick = () => {
+        solve(true);
+    }
+    document.getElementById("solveByFermat").onclick = () => {
+        solve(false);
     }
 })();
